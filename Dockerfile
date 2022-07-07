@@ -1,12 +1,16 @@
 FROM ubuntu:18.04
 
-RUN apt-get update
-RUN apt-get install wget curl default-jre openjdk-17-jre-headless -y
+RUN apt-get update \
+&& apt-get install -y \
+wget=1.19.4-1ubuntu2.2 \
+curl=7.58.0-2ubuntu3.19 \
+default-jre=2:1.11-68ubuntu1~18.04.1 \
+openjdk-17-jre-headless=17.0.3+7-0ubuntu0.18.04.1 \
+&& rm -rf /var/lib/apt/lists/*
 
-ENV mc_tag=1.16.3
-RUN wget -c "$(curl https://mcversions.net/download/${mc_tag} | grep -o https://launcher\.mojang.*server\.jar)" -O minecraft_server.jar
+WORKDIR /app
 
-COPY server.properties server.properties
-COPY eula.txt eula.txt
+ARG SERVER_VERSION
+RUN wget -c "$(curl https://mcversions.net/download/${SERVER_VERSION} | grep -Po https://launcher\.mojang\.com/v1/objects/[0-9a-f]{40}/server\.jar)" -O minecraft_server.jar
 
-CMD ["java", "-Xmx1024M", "-Xms1024M", "-jar", "minecraft_server.jar", "nogui"]
+COPY server.properties eula.txt /app/

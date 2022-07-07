@@ -1,6 +1,9 @@
 #/bin/bash
 
-docker stop mcserver
-docker rm $(docker ps -a -q -f status=exited)
-docker build --rm -t mcserver .
-docker run -d --name mcserver -p 25565:25565 mcserver
+SERVER_VERSION=$1
+SERVER_VERSION=${SERVER_VERSION:-1.16.3}
+
+docker-compose build \
+--build-arg SERVER_VERSION=${SERVER_VERSION}
+
+docker-compose up -d
