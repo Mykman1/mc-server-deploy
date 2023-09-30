@@ -1,4 +1,8 @@
+FROM google/cloud-sdk:alpine as gcloud
+
 FROM alpine
+
+COPY --from=gcloud / /
 
 RUN apk add --no-cache \
     grep \
@@ -14,3 +18,5 @@ RUN wget \
     -O minecraft_server.jar
 
 COPY server.properties eula.txt ./
+COPY backup_daily.sh /etc/periodic/daily/
+COPY backup_weekly.sh /etc/periodic/weekly/

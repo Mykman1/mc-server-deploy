@@ -3,28 +3,17 @@ services:
   mcserver:
     build:
       context: .
-    command:
+    command: # /google-cloud-sdk/bin/gsutil -m rsync -r -d gs://project-secret-minecraft-backup-weekly/20200928-020001-world /world
       - sh
       - -c
       - |
-        screen -d -m java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui
+        screen -dmS mc java -Xmx1024M -Xms1024M -jar minecraft_server.jar nogui
         sleep infinity
     container_name: mcserver
     ports:
       - 25565:25565
     volumes:
       - savefiles:/mc/world
-  mcsync:
-    image: google/cloud-sdk:alpine
-    command: 
-      - sh
-      - -c
-      - |
-        gsutil -m rsync -r -d gs://project-secret-minecraft-backup-weekly/20200928-020001-world /world
-        sleep infinity
-    container_name: mcsync
-    volumes:
-      - savefiles:/world
       - ${HOME}/.config:/root/.config:ro
 volumes:
   savefiles:
