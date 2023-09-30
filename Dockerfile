@@ -2,7 +2,8 @@ FROM alpine
 
 RUN apk add --no-cache \
     grep \
-    openjdk17-jre-headless
+    openjdk17-jre-headless \
+    screen
 
 WORKDIR /mc
 
