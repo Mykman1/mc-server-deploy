@@ -1,8 +1,4 @@
-FROM google/cloud-sdk:alpine as gcloud
-
-FROM alpine
-
-COPY --from=gcloud / /
+FROM google/cloud-sdk:alpine
 
 RUN apk add --no-cache \
     grep \

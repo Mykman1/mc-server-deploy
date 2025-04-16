@@ -1,9 +1,11 @@
-version: "3"
 services:
   mcserver:
     build:
       context: .
-    command: # /google-cloud-sdk/bin/gsutil -m rsync -r -d gs://project-secret-minecraft-backup-weekly/20200928-020001-world /world
+    profiles:
+      - server
+      - restore
+    command:
       - sh
       - -c
       - |
@@ -14,6 +16,24 @@ services:
       - 25565:25565
     volumes:
       - savefiles:/mc/world
-      - ${HOME}/.config:/root/.config:ro
+      - ${HOME}/.config/gcloud:/root/.config/gcloud
+  restore_saves:
+    image: google/cloud-sdk:alpine
+    build:
+      context: .
+    profiles:
+      - restore
+    command:
+      - sh
+      - -c
+      - |
+        rm -rf /mc/world/* \
+        && gcloud storage cp "$(gcloud storage ls -l gs://project-secret-minecraft-backup gs://project-secret-minecraft-backup-weekly | sort -k 2 | tail -3 | head -1 | grep -Po '[^ ]+$')" - | tar -xzvf - -C /mc/world
+      # - |
+      #   gcloud storage rsync -r --delete-unmatched-destination-objects \
+      #   gs://project-secret-minecraft-backup-weekly/20200928-020001-world /mc/world
+    volumes:
+      - savefiles:/mc/world
+      - ${HOME}/.config/gcloud:/root/.config/gcloud
 volumes:
   savefiles:
